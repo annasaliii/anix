@@ -1,1 +1,1 @@
-anix - short for annas unix
+# anix - short for annas unix
