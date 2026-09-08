@@ -1,0 +1,16 @@
+/bin/
+/obj/
+
+/*.iso
+/*.hdd
+
+/iso_root/
+
+/limine-binary/
+
+.DS_Store
+
+*.dSYM/
+*.log
+
+/.vscode/
