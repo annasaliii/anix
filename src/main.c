@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <limine.h>
+#include "serial.h"
 #define PORT 0x3F8
 
 // Set the base revision to 6, this is recommended as this is the latest
@@ -92,22 +93,6 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 static void hcf(void) {
     for (;;) {
         asm ("hlt");
-    }
-}
-
-static inline void outb(unsigned short port, unsigned char val) {
-    // Uses the x86 'out' instruction to send 'val' (al) to 'port' (dx)
-    asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
-}
-
-void serial_write_char(const char c){
-    outb(PORT, c);
-}
-
-void kprint(const char *str) {
-    size_t i = 0;
-    while(*str) {
-        serial_write_char(str[i++]);
     }
 }
 
