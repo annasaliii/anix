@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <limine.h>
+#define PORT 0x3F8
 
 // Set the base revision to 6, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -94,6 +95,22 @@ static void hcf(void) {
     }
 }
 
+static inline void outb(unsigned short port, unsigned char val) {
+    // Uses the x86 'out' instruction to send 'val' (al) to 'port' (dx)
+    asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
+}
+
+void serial_write_char(const char c){
+    outb(PORT, c);
+}
+
+void kprint(const char *str) {
+    size_t i = 0;
+    while(*str) {
+        serial_write_char(str[i++]);
+    }
+}
+
 // The following will be our kernel's entry point.
 // If renaming kmain() to something else, make sure to change the
 // linker script accordingly.
@@ -110,18 +127,9 @@ void kmain(void) {
     }
 
     // Fetch the first framebuffer.
-    struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
+    //struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
-    // Print a nice pattern to screen as an example.
-    // Note: we assume the framebuffer model is RGB with 32-bit pixels.
-    volatile uint32_t *fb_ptr = framebuffer->address;
-    for (size_t y = 0; y < framebuffer->height; y++) {
-        for (size_t x = 0; x < framebuffer->width; x++) {
-            uint32_t nX = x * 255 / framebuffer->width;
-            uint32_t nY = y * 255 / framebuffer->height;
-            fb_ptr[y * (framebuffer->pitch / 4) + x] = (nY << 8) | nX;
-        }
-    }
+    kprint("ANIX booted");
 
     // We're done, just hang...
     hcf();
